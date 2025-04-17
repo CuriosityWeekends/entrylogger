@@ -1,6 +1,6 @@
 [project]
 name = "entrylogger"
-version = "0.1.4"
+version = "0.1.5"
 description = "A Python module to log workspace entries"
 authors = [
     { name="Hadin Abdul Hameed", email="libapayapura+git@gmail.com" }
