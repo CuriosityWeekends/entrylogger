@@ -4,7 +4,6 @@ from datetime import date
 import os
 
 load_dotenv()
-
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 
