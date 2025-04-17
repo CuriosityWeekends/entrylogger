@@ -1,12 +1,16 @@
 from supabase import create_client, PostgrestAPIResponse
 from dotenv import load_dotenv
 from datetime import date
+from pathlib import Path
 import os
 
-load_dotenv()
+print(Path.cwd())
+load_dotenv(dotenv_path=Path.cwd() / ".env")
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 
+if not url or not key:
+    raise Exception("Missing required environment variables: SUPABASE_URL and SUPABASE_KEY")
 supabase = create_client(url, key)
 
 def create_user(name: str, email:str) -> PostgrestAPIResponse:
@@ -22,7 +26,7 @@ def create_user(name: str, email:str) -> PostgrestAPIResponse:
     }
 
     response = supabase.table("users").insert(data).execute()
-    return response
+    return response.data
 
 def start_workday(notes: str='regular') -> PostgrestAPIResponse:
     '''
@@ -36,7 +40,7 @@ def start_workday(notes: str='regular') -> PostgrestAPIResponse:
     }
 
     response = supabase.table("workdays").insert(data).execute()
-    return response
+    return response.data
 
 def stop_workday(notes: str='regular') -> PostgrestAPIResponse:
     '''
@@ -50,7 +54,7 @@ def stop_workday(notes: str='regular') -> PostgrestAPIResponse:
     }
 
     response = supabase.table("workdays").update(data).eq("workday_id", str(date.today())).execute()
-    return response
+    return response.data
 
 def mark_entry(user_id: str) -> PostgrestAPIResponse:
     '''
@@ -65,7 +69,7 @@ def mark_entry(user_id: str) -> PostgrestAPIResponse:
     }
 
     response = supabase.table("entry_logs").insert(data).execute()
-    return response
+    return response.data
 
 def mark_exit(user_id: str) -> PostgrestAPIResponse:
     '''
@@ -80,7 +84,7 @@ def mark_exit(user_id: str) -> PostgrestAPIResponse:
     }
 
     response = supabase.table("entry_logs").insert(data).execute()
-    return response
+    return response.data
 
 def mark_task(user_id: str, task: str, tags: str="") -> PostgrestAPIResponse:
     '''
@@ -96,26 +100,26 @@ def mark_task(user_id: str, task: str, tags: str="") -> PostgrestAPIResponse:
     }
 
     response = supabase.table("task_logs").insert(data).execute()
-    return response
+    return response.data
 
-def get_table_data(table_name: str, **filters) -> PostgrestAPIResponse:
+def get_table_datas(table_name: str, **filters) -> PostgrestAPIResponse:
     '''
     To get datas of any table, where key=value.
 
     eg:
-    get_table_data('users', name="Hadin Abdul Hameed")
+    get_table_datas('users', name="Hadin Abdul Hameed")
     '''
     query = supabase.table(table_name).select("*")
     for key, value in filters.items():
         query = query.eq(key, value)
     return query.execute()
 
-def get_user(user_id: str="*", name: str="*", email: str="*") -> PostgrestAPIResponse:
+def get_users(user_id: str="*", name: str="*", email: str="*") -> PostgrestAPIResponse:
     '''
     To get datas inside `users` table, where key=value(if any).
     
     eg:
-    get_user(email="hadinabdulhameed@gmail.com")
+    get_users(email="hadinabdulhameed@gmail.com")
     '''
     query = supabase.table("users").select("*")
 
@@ -127,7 +131,7 @@ def get_user(user_id: str="*", name: str="*", email: str="*") -> PostgrestAPIRes
         query = query.eq("email", email)
 
     response = query.execute()
-    return response
+    return response.data
 
 def get_workday(workday_id: str="*", notes: str="*", opening_time: str="*", closing_time: str="*") -> PostgrestAPIResponse:
     '''
@@ -148,7 +152,7 @@ def get_workday(workday_id: str="*", notes: str="*", opening_time: str="*", clos
         query = query.eq("closing_time", closing_time)
 
     response = query.execute()
-    return response
+    return response.data
 
 def get_entry(entry_id: str="*", workday_id: str="*", user_id: str="*") -> PostgrestAPIResponse:
     '''
@@ -167,14 +171,14 @@ def get_entry(entry_id: str="*", workday_id: str="*", user_id: str="*") -> Postg
         query = query.eq("user_id", user_id)
 
     response = query.execute()
-    return response
+    return response.data
 
-def get_exit(entry_id: str="*", workday_id: str="*", user_id: str="*") -> PostgrestAPIResponse:
+def get_exits(entry_id: str="*", workday_id: str="*", user_id: str="*") -> PostgrestAPIResponse:
     '''
     To get datas inside `entry_logs` table, where key=value(if any) (With `entry`=False).
     
     eg:
-    get_exit(user_id="aad1a0aa-dea4-a1ae-4a1a-aaeaaaa10aaa", workday_id="2025-04-17")
+    get_exits(user_id="aad1a0aa-dea4-a1ae-4a1a-aaeaaaa10aaa", workday_id="2025-04-17")
     '''
     query = supabase.table("entry_logs").select("*").eq("entry", False)
 
@@ -186,14 +190,14 @@ def get_exit(entry_id: str="*", workday_id: str="*", user_id: str="*") -> Postgr
         query = query.eq("user_id", user_id)
 
     response = query.execute()
-    return response
+    return response.data
 
-def get_task(id: str="*", workday_id: str="*", user_id: str="*", tags: dict=[], name: str="*") -> PostgrestAPIResponse:
+def get_tasks(id: str="*", workday_id: str="*", user_id: str="*", tags: dict=[], name: str="*") -> PostgrestAPIResponse:
     '''
     To get datas inside `task_logs` table, where key=value(if any).
     
     eg:
-    get_task(workday_id="2025-04-1.7", tags=["python"])
+    get_tasks(workday_id="2025-04-1.7", tags=["python"])
     '''
     query = supabase.table("task_logs").select("*")
 
@@ -210,8 +214,11 @@ def get_task(id: str="*", workday_id: str="*", user_id: str="*", tags: dict=[], 
     
 
     response = query.execute()
-    return response
+    return response.data
 
+__all__ = ["create_user", "start_workday", "stop_workday", "mark_entry",
+           "mark_exit", "mark_task", "get_table_datas", "get_users", "get_workday",
+           "get_entry", "get_exits", "get_tasks"]
 if __name__ == "__main__":
-    print(get_task(workday_id="2025-04-17", tags=["python"]))
+    print(get_tasks(workday_id="2025-04-17", tags=["python"]))
     pass
