@@ -36,11 +36,9 @@ You can install the module directly from pip:
 ```bash
 pip install entrylogger
 ```
-Alternatively, you can clone the repository directly:
+Alternatively, you can install module directly from git:
 ```bash
-git clone https://github.com/hadinah/entrylogger.git
-cd entrylogger
-python setup.py install
+pip install git+https://github.com/hadinah/entrylogger.git
 ```
 ## Usage
 1. Setting up the environment:
