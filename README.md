@@ -22,7 +22,7 @@ EntryLogger is a simple yet efficient Python module designed to track entry and 
 pip install -r requirements.txt
 ```
 
-Setup .env
+3. Setup .env
 
 Before you can use the module, ensure you have the required environment variables set up for Supabase integration. Create a .env file in the root of your project with the following variables:
 ```python
@@ -32,6 +32,8 @@ SUPABASE_DB_URL=your_supabase_db_url
 ```
 Replace your_supabase_url, your_supabase_key and your_supabase_db_url with your actual Supabase project credentials.
 Installation via pip
+
+4. Installing the module.
 
 You can install the module directly from pip:
 ```bash
