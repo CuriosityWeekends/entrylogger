@@ -28,8 +28,9 @@ Before you can use the module, ensure you have the required environment variable
 ```python
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key (service key/secret)
+SUPABASE_DB_URL=your_supabase_db_url
 ```
-Replace your_supabase_url and your_supabase_key with your actual Supabase project credentials.
+Replace your_supabase_url, your_supabase_key and your_supabase_db_url with your actual Supabase project credentials.
 Installation via pip
 
 You can install the module directly from pip:
@@ -43,7 +44,8 @@ pip install git+https://github.com/hadinah/entrylogger.git
 ## Usage
 1. Setting up the environment:
 
-Ensure your .env file is properly configured with the correct Supabase credentials (SUPABASE_URL and SUPABASE_KEY).
+Ensure your .env file is properly configured with the correct Supabase credentials (SUPABASE_URL and SUPABASE_KEY, SUPABASE_DB_URL).
+
 2. Basic Usage Example:
 
 Here's an example of how you can use the module to track user entry and exit times:

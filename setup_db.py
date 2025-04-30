@@ -2,24 +2,28 @@
 Run This Script To Set-Up Te entire Database Structure
 '''
 
-from supabase import create_client, Client
-from dotenv import load_dotenv
 import os
+import psycopg2
+from dotenv import load_dotenv
 
 load_dotenv()
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
 
-if not url or not key:
-    raise Exception("Missing required environment variables: SUPABASE_URL and SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+db_url = os.getenv("SUPABASE_DB_URL")
+if not db_url:
+    raise Exception("Missing SUPABASE_DB_URL in .env")
 
-with open("schema.sql", "r") as file:
-    schema_sql = file.read()
+try:
+    conn = psycopg2.connect(db_url)
+    conn.autocommit = True  # So that CREATE statements take effect immediately
 
-response= supabase.schema("public").rpc("sql", schema_sql)
-print(response)
-if response:
-    print("✅ Schema initialized successfully.")
-else:
-    print(f"❌ Failed to initialize schema. Response: {response}")
+    with conn.cursor() as cur:
+        with open("schema.sql", "r") as file:
+            schema_sql = file.read()
+            cur.execute(schema_sql)
+            print("✅ Schema applied successfully.")
+
+except Exception as e:
+    print(f"❌ Error: {e}")
+finally:
+    if 'conn' in locals():
+        conn.close()
