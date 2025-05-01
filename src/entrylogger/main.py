@@ -13,7 +13,7 @@ if not url or not key:
     raise Exception("Missing required environment variables: SUPABASE_URL and SUPABASE_KEY")
 supabase = create_client(url, key)
 
-def create_user(name: str, email:str) -> PostgrestAPIResponse:
+def create_user(name: str, email:str, **extra_fields) -> PostgrestAPIResponse:
     '''
     To create a new user. (Inside `users` table)
     
@@ -23,12 +23,13 @@ def create_user(name: str, email:str) -> PostgrestAPIResponse:
     data = {
         "name": name,
         "email": email,
+        **extra_fields
     }
 
     response = supabase.table("users").insert(data).execute()
     return response.data
 
-def start_workday(notes: str='regular') -> PostgrestAPIResponse:
+def start_workday(notes: str='regular', **extra_fields) -> PostgrestAPIResponse:
     '''
     To start workday. (Inside `workdays` table)
 
@@ -37,12 +38,13 @@ def start_workday(notes: str='regular') -> PostgrestAPIResponse:
     '''
     data = {
         "notes": notes,
+        **extra_fields
     }
 
     response = supabase.table("workdays").insert(data).execute()
     return response.data
 
-def stop_workday(notes: str='regular') -> PostgrestAPIResponse:
+def stop_workday(notes: str='regular', **extra_fields) -> PostgrestAPIResponse:
     '''
     To stop workday. (Inside `workdays` table)
 
@@ -51,12 +53,13 @@ def stop_workday(notes: str='regular') -> PostgrestAPIResponse:
     '''
     data = {
         "notes": notes,
+        **extra_fields
     }
 
     response = supabase.table("workdays").update(data).eq("workday_id", str(date.today())).execute()
     return response.data
 
-def mark_entry(user_id: str) -> PostgrestAPIResponse:
+def mark_entry(user_id: str, **extra_fields) -> PostgrestAPIResponse:
     '''
     To mark the entry of user. (Inside `entry_logs` table, with `entry=True`)
 
@@ -71,7 +74,7 @@ def mark_entry(user_id: str) -> PostgrestAPIResponse:
     response = supabase.table("entry_logs").insert(data).execute()
     return response.data
 
-def mark_exit(user_id: str) -> PostgrestAPIResponse:
+def mark_exit(user_id: str, **extra_fields) -> PostgrestAPIResponse:
     '''
     To mark the exit of the user. (Inside `entry_logs`, with `entry=False`)
 
@@ -81,12 +84,13 @@ def mark_exit(user_id: str) -> PostgrestAPIResponse:
     data = {
         "user_id": user_id,
         "entry": False,
+        **extra_fields
     }
 
     response = supabase.table("entry_logs").insert(data).execute()
     return response.data
 
-def mark_task(user_id: str, task: str, tags: str="") -> PostgrestAPIResponse:
+def mark_task(user_id: str, task: str, tags: str="", **extra_fields) -> PostgrestAPIResponse:
     '''
     To mark task, which is done. (Inside `task_logs`)
 
@@ -97,6 +101,7 @@ def mark_task(user_id: str, task: str, tags: str="") -> PostgrestAPIResponse:
         "name": task,
         "user_id": user_id,
         "tags": tags,
+        **extra_fields
     }
 
     response = supabase.table("task_logs").insert(data).execute()
@@ -114,7 +119,7 @@ def get_table_datas(table_name: str, **filters) -> PostgrestAPIResponse:
         query = query.eq(key, value)
     return query.execute()
 
-def get_users(user_id: str="*", name: str="*", email: str="*") -> PostgrestAPIResponse:
+def get_users(user_id: str="*", name: str="*", email: str="*", operator: str="", **extra_fields) -> PostgrestAPIResponse:
     '''
     To get datas inside `users` table, where key=value(if any).
     
@@ -129,6 +134,8 @@ def get_users(user_id: str="*", name: str="*", email: str="*") -> PostgrestAPIRe
         query = query.eq("name", name)
     if email != "*":
         query = query.eq("email", email)
+        query.cd
+    #for key, item in extra_fields
 
     response = query.execute()
     return response.data
@@ -220,5 +227,4 @@ __all__ = ["create_user", "start_workday", "stop_workday", "mark_entry",
            "mark_exit", "mark_task", "get_table_datas", "get_users", "get_workday",
            "get_entry", "get_exits", "get_tasks"]
 if __name__ == "__main__":
-    print(get_tasks(workday_id="2025-04-17", tags=["python"]))
-    pass
+    print(create_user(name="Hadin Abdul Hameed", email="hadinabdulhameed@gmail.com", discord_id="1087016840737341581"))
